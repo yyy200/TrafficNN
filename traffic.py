@@ -60,11 +60,7 @@ def load_data(data_dir):
     corresponding `images`.
     """
     images = list()
-    #np.ndarray((IMG_WIDTH, IMG_HEIGHT, 3),dtype=float)
-
     labels = list()
-    
-    print(cv2.imread(os.path.join(data_dir,str(0),f"{str(5).zfill(5)}_{str(78).zfill(5)}.ppm")))
 
     for i in range(NUM_CATEGORIES):
         j = 0
@@ -73,14 +69,16 @@ def load_data(data_dir):
                 img = cv2.imread(os.path.join(data_dir,str(i),f"{str(j).zfill(5)}_{str(k).zfill(5)}.ppm"))
                 if type(img) != np.ndarray:
                     break
+                    
 
                 images.append(img)
                 labels.append(i)
             
+            if type(img) != np.ndarray:
+                    break
             j += 1
             
-            if type(img) != np.ndarray:
-                break
+            
 
     print(len(images), ":", len(labels))
     return images, labels
