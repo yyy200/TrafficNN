@@ -4,13 +4,15 @@ import numpy as np
 import os
 import sys
 import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
 
 from sklearn.model_selection import train_test_split
 
-EPOCHS = 10
+EPOCHS = 20
 IMG_WIDTH = 30
 IMG_HEIGHT = 30
-NUM_CATEGORIES = 1#43
+NUM_CATEGORIES = 43
 TEST_SIZE = 0.4
 
 
@@ -67,19 +69,16 @@ def load_data(data_dir):
         while True:
             for k in range(30):
                 img = cv2.imread(os.path.join(data_dir,str(i),f"{str(j).zfill(5)}_{str(k).zfill(5)}.ppm"))
+
                 if type(img) != np.ndarray:
                     break
-                    
 
-                images.append(img)
+                images.append(cv2.resize(img, (IMG_WIDTH, IMG_HEIGHT)))
                 labels.append(i)
-            
+
             if type(img) != np.ndarray:
                     break
             j += 1
-            
-            
-
     print(len(images), ":", len(labels))
     return images, labels
 
@@ -89,8 +88,31 @@ def get_model():
     `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
     The output layer should have `NUM_CATEGORIES` units, one for each category.
     """
-    raise NotImplementedError
 
+    model = keras.Sequential(
+        [
+            layers.Conv2D(5356, (3, 3), activation="relu", input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)),
+            layers.MaxPooling2D(pool_size=(3, 3)),    
+            layers.Flatten(),
+            layers.Dense(700, activation="relu"),
+            layers.Dropout(.03),
+            layers.Dense(330, activation="relu"),
+            layers.Dense(456, activation="relu"),
+            layers.Dense(16, activation="relu"),
+            layers.Dense(NUM_CATEGORIES, activation="softmax")     
+        ]
+    )
 
+    model.build()
+
+    model.summary()
+    
+    model.compile(
+        optimizer="adam",
+        loss="categorical_crossentropy",
+        metrics=["accuracy"]
+    )
+
+    return model
 if __name__ == "__main__":
     main()
